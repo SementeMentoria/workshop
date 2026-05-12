@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Enjoyce - Descubra seu Perfume Ideal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(to bottom, #F5F1EB 0%, #E8DCC8 100%);
+            color: #333;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+        header {
+            background: linear-gradient(to right, #D4AF37, #C9A961);
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        #logo {
+            max-width: 300px;
+            height: auto;
+            margin-bottom: 10px;
+        }
+        h1 {
+            font-family: 'Playfair Display', serif;
+            color: #F5F1EB;
+            margin: 0;
+            font-size: 1.8em;
+        }
+        main {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .progress-container {
+            background: #E8DCC8;
+            padding: 15px;
+            text-align: center;
+            margin: 20px 0;
+            border-radius: 25px;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .progress-bar {
+            background: #B8A3A3;
+            height: 12px;
+            border-radius: 6px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+        .progress-fill {
+            background: linear-gradient(to right, #D4AF37, #C9A961);
+            height: 100%;
+            width: 0%;
+            transition: width 0.4s ease;
+            border-radius: 6px;
+        }
+        #progress-text {
+            font-weight: 500;
+            color: #9B8B8B;
+        }
+        .screen {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+        .screen.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        #question-container h2 {
+            font-family: 'Playfair Display', serif;
+            color: #D4AF37;
+            font-size: 1.6em;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .option {
+            display: block;
+            margin: 20px 0;
+            padding: 20px;
+            background: #F5F1EB;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 5px solid #D4AF37;
+            font-size: 1.1em;
+        }
+        .option:hover {
+            background: #E8DCC8;
+            transform: translateX(10px);
+            box-shadow: 0 5px 15px rgba(212,175,55,0.3);
+        }
+        .option input {
+            margin-right: 15px;
+            transform: scale(1.2);
+            accent-color: #D4AF37;
+        }
+        #navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
+        }
+        button {
+            padding: 15px 40px;
+            border: none;
+            border-radius: 30px;
+            font-size: 1.1em;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Roboto', sans-serif;
+        }
+        #prev-btn {
+            background: #B8A3A3;
+            color: white;
+        }
+        #prev-btn:hover:not(:disabled) {
+            background: #9B8B8B;
+            transform: scale(1.05);
+        }
+        #prev-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        #next-btn {
+            background: linear-gradient(to right, #D4AF37, #C9A961);
+            color: white;
+        }
+        #next-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(212,175,55,0.4);
+        }
+        #lead-form {
+            display: grid;
+            gap: 20px;
+            background: #F5F1EB;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        #lead-form h2 {
+            font-family: 'Playfair Display', serif;
+            color: #D4AF37;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        #lead-form input,
+        #lead-form select {
+            padding: 18px;
+            border: 2px solid #E8DCC8;
+            border-radius: 12px;
+            font-size: 1em;
+            background: white;
+            transition: border-color 0.3s;
+        }
+        #lead-form input:focus,
+        #lead-form select:focus {
+            outline: none;
+            border-color: #D4AF37;
+        }
+        #lead-form label {
+            display: flex;
+            align-items: flex-start;
+            font-size: 0.95em;
+            color: #9B8B8B;
+            cursor: pointer;
+        }
+        #lead-form input[type="checkbox"] {
+            margin-right: 10px;
+            margin-top: 2px;
+            transform: scale(1.2);
+            accent-color: #D4AF37;
+        }
+        #lead-form button {
+            background: linear-gradient(to right, #D4AF37, #C9A961);
+            color: white;
+            font-size: 1.2em;
+            padding: 20px;
+        }
+        #lead-form button:hover {
+            transform: scale(1.02);
+        }
+        #result-content {
+            text-align: center;
+            padding: 60px 40px;
+            background: linear-gradient(to bottom, #F5F1EB, #E8DCC8);
+            border-radius: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        #profile-name {
+            font-family: 'Playfair Display', serif;
+            font-size: 3.5em;
+            color: #D4AF37;
+            margin: 0 0 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+        #product {
+            font-size: 1.8em;
+            color: #B8A3A3;
+            margin: 0 0 40px;
+            font-weight: 300;
+        }
+        #share-section {
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        #share-btn {
+            background: linear-gradient(to right, #D4AF37, #C9A961);
+            color: white;
+            min-width: 200px;
+        }
+        #retry-btn {
+            background: #B8A3A3;
+            color: white;
+            min-width: 200px;
+        }
+        #share-btn:hover, #retry-btn:hover {
+            transform: scale(1.05);
+        }
+        @media (max-width: 768px) {
+            main {
+                padding: 10px;
+            }
+            h1 {
+                font-size: 1.4em;
+            }
+            #question-container h2 {
+                font-size: 1.3em;
+            }
+            .option {
+                padding: 15px;
+                font-size: 1em;
+            }
+            #navigation {
+                flex-direction: column;
+            }
+            button {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+            #lead-form {
+                padding: 30px 20px;
+            }
+            #profile-name {
+                font-size: 2.5em;
+            }
+            #share-section {
+                flex-direction: column;
+                width: 100%;
+            }
+            #share-section button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <img id="logo" src="cabealho.png" alt="Logo Enjoyce">
+        <h1>Descubra seu Perfume Ideal</h1>
+    </header>
+    <main>
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-fill"></div>
+            </div>
+            <div id="progress-text">0/12</div>
+        </div>
+        <div id="quiz-screen" class="screen active">
+            <div id="question-container">
+                <h2 id="question-title"></h2>
+                <div id="options"></div>
+            </div>
+            <div id="navigation">
+                <button id="prev-btn" disabled>Anterior</button>
+                <button id="next-btn">Próximo</button>
+            </div>
+        </div>
+        <div id="lead-screen" class="screen">
+            <h2>Complete seus dados para receber o resultado!</h2>
+            <form id="lead-form">
+                <input type="text" id="name" placeholder="Nome completo *" required>
+                <input type="email" id="email" placeholder="E-mail *" required>
+                <input type="tel" id="whatsapp" placeholder="WhatsApp (ex: (11) 99999-9999) *" required>
+                <input type="text" id="city" placeholder="Cidade *" required>
+                <select id="age" required>
+                    <option value="">Selecione sua faixa etária *</option>
+                    <option value="18-24">18-24 anos</option>
+                    <option value="25-34">25-34 anos</option>
+                    <option value="35-44">35-44 anos</option>
+                    <option value="45-54">45-54 anos</option>
+                    <option value="55+">55+ anos</option>
+                </select>
+                <label>
+                    <input type="checkbox" id="auth" required>
+                    Autorizo receber comunicações sobre Enjoyce via e-mail e WhatsApp
+                </label>
+                <button type="submit">Enviar e Ver Meu Resultado</button>
+            </form>
+        </div>
+        <div id="result-screen" class="screen">
+            <div id="result-content">
+                <h2 id="profile-name"></h2>
+                <p id="product"></p>
+                <!-- Adicione imagens de perfil aqui se disponíveis -->
+                <!-- <img id="profile-img" src="" alt="Perfil"> -->
+                <div id="share-section">
+                    <button id="share-btn">Compartilhar Resultado</button>
+                    <button id="retry-btn">Fazer Quiz Novamente</button>
+                </div>
+            </div>
+        </div>
+    </main>
+    <script>
+        const questions = [
+            {
+                question: "Como seria o seu fim de semana perfeito?",
+                options: [
+                    "a) Um jantar especial ou um passeio cheio de charme.",
+                    "b) Uma viagem leve, contato com a natureza e liberdade.",
+                    "c) Um lugar marcante, noite envolvente e clima misterioso.",
+                    "d) Um café elegante, city walk e lugares estilosos.",
+                    "e) Um programa sofisticado, prazeroso e cheio de conforto."
+                ]
+            },
+            {
+                question: "Qual palavra mais combina com você?",
+                options: [
+                    "a) Delicada.",
+                    "b) Livre.",
+                    "c) Magnética.",
+                    "d) Autêntica.",
+                    "e) Envolvente."
+                ]
+            },
+            {
+                question: "Qual look mais representa sua essência?",
+                options: [
+                    "a) Feminino e delicado, com um toque de romantismo.",
+                    "b) Leve, fresco e descomplicado.",
+                    "c) Marcante, elegante e sedutor.",
+                    "d) Minimalista, moderno e estiloso.",
+                    "e) Sofisticado, confortável e irresistível."
+                ]
+            },
+            {
+                question: "Qual cenário combina mais com sua energia?",
+                options: [
+                    "a) Jardim de rosas com luz dourada do pôr do sol.",
+                    "b) Praia ao amanhecer com brisa marinha fresca.",
+                    "c) Jantar à luz de velas em palácio oriental.",
+                    "d) Um rooftop bar moderno com vista da cidade.",
+                    "e) Um lounge sofisticado com luz baixa e drinks especiais."
+                ]
+            },
+            {
+                question: "Que elogio você mais gostaria de ouvir?",
+                options: [
+                    "a) Você é encantadora.",
+                    "b) Sua energia é leve e contagiante.",
+                    "c) Você é inesquecível.",
+                    "d) Você é muito estilosa.",
+                    "e) Você tem algo viciante."
+                ]
+            },
+            {
+                question: "Qual bebida combina mais com você?",
+                options: [
+                    "a) Chá floral ou espumante delicado.",
+                    "b) Uma bebida cítrica e refrescante.",
+                    "c) Uma bebida intensa com especiarias.",
+                    "d) Um café expresso ou um drink autoral.",
+                    "e) Um latte cremoso, baunilhado ou licores."
+                ]
+            },
+            {
+                question: "O que você espera que o seu perfume transmita?",
+                options: [
+                    "a) Delicadeza e feminilidade.",
+                    "b) Frescor e liberdade.",
+                    "c) Presença e sedução.",
+                    "d) Estilo e autenticidade.",
+                    "e) Prazer e envolvimento."
+                ]
+            },
+            {
+                question: "Qual desses acordes mais te atrai?",
+                options: [
+                    "a) Flores delicadas e luminosas.",
+                    "b) Cítricos frescos e notas solares.",
+                    "c) Âmbar, especiarias e um toque oriental.",
+                    "d) Musk limpo e madeiras elegantes.",
+                    "e) Baunilha cremosa e notas envolventes."
+                ]
+            },
+            {
+                question: "Em um momento especial, que imagem você quer transmitir?",
+                options: [
+                    "a) Charme e delicadeza.",
+                    "b) Leveza e brilho natural.",
+                    "c) Presença e magnetismo.",
+                    "d) Elegância e autenticidade.",
+                    "e) Conforto e sofisticação."
+                ]
+            },
+            {
+                question: "Qual destino mais te inspira?",
+                options: [
+                    "a) Paris na primavera, com jardins floridos.",
+                    "b) Costa Amalfitana em um dia de sol perfeito.",
+                    "c) Dubai ou Marrakech à noite, cheia de surpresas.",
+                    "d) Milão, Nova York ou Tóquio — metrópoles vibrantes.",
+                    "e) Um resort com spa e gastronomia refinada."
+                ]
+            },
+            {
+                question: "Como você costuma escolher um perfume?",
+                options: [
+                    "a) Pelo lado floral e delicado que evoca feminilidade.",
+                    "b) Pela sensação fresca e revigorante que dá energia.",
+                    "c) Pela assinatura marcante e misteriosa que deixa lembrança.",
+                    "d) Pelo equilíbrio clean, elegante e autêntico.",
+                    "e) Pelo lado cremoso, viciante e confortável."
+                ]
+            },
+            {
+                question: "Se o seu perfume fosse uma memória olfativa, qual seria?",
+                options: [
+                    "a) Um buquê de flores frescas recebido em momento especial.",
+                    "b) O cheiro de sol, mar e liberdade de um dia perfeito na praia.",
+                    "c) Uma noite exótica que ninguém consegue esquecer.",
+                    "d) Um momento chique e autêntico em uma cidade que nunca dorme.",
+                    "e) Uma sobremesa sofisticada compartilhada em clima íntimo."
+                ]
+            }
+        ];
+
+        const tripleQuestions = [6, 7, 10]; // 0-based for Q7,8,11
+        const profiles = {
+            'A': { name: 'ROMÂNTICA', product: 'Enjoyce FL.02 - Floral Luminoso' },
+            'B': { name: 'AVENTUREIRA', product: 'Enjoyce FR.03 - Cítrico Fresh' },
+            'C': { name: 'SENSUAL', product: 'Enjoyce AM.04 - Âmbar Oriental' },
+            'D': { name: 'MODERNA', product: 'Enjoyce WO.05 - Woody Musk' },
+            'E': { name: 'SENSORIAL', product: 'Enjoyce GD.01 - Gourmand Refinado' }
+        };
+
+        let currentQuestion = 0;
+        let answers = new Array(12).fill(-1);
+        let currentProfile = null;
+
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            document.getElementById(screenId + '-screen').classList.add('active');
+        }
+
+        function updateProgress() {
+            const percentage = ((currentQuestion + 1) / 12) * 100;
+            document.querySelector('.progress-fill').style.width = percentage + '%';
+            document.getElementById('progress-text').textContent = `${currentQuestion + 1}/12`;
+        }
+
+        function saveCurrentAnswer() {
+            const selected = document.querySelector(`input[name="q${currentQuestion}"]:checked`);
+            if (selected) {
+                answers[currentQuestion] = parseInt(selected.value);
+            }
+        }
+
+        function showQuestion(idx) {
+            currentQuestion = idx;
+            document.getElementById('question-title').textContent = `Pergunta ${idx + 1}: ${questions[idx].question}`;
+            const optionsDiv = document.getElementById('options');
+            optionsDiv.innerHTML = '';
+            questions[idx].options.forEach((option, i) => {
+                const label = document.createElement('label');
+                label.className = 'option';
+                label.innerHTML = `<input type="radio" name="q${idx}" value="${i}" ${answers[idx] === i ? 'checked' : ''}> ${option}`;
+                optionsDiv.appendChild(label);
+            });
+            updateProgress();
+            document.getElementById('prev-btn').disabled = idx === 0;
+            document.getElementById('next-btn').textContent = idx === 11 ? 'Finalizar Quiz' : 'Próximo';
+        }
+
+        function getScores() {
+            const points = { A: 0, B: 0, C: 0, D: 0, E: 0 };
+            const tiePoints = { A: 0, B: 0, C: 0, D: 0, E: 0 };
+            for (let i = 0; i < 12; i++) {
+                if (answers[i] === -1) return null;
+                const letter = String.fromCharCode(65 + answers[i]);
+                const pt = tripleQuestions.includes(i) ? 3 : 1;
+                points[letter] += pt;
+                if (tripleQuestions.includes(i)) {
+                    tiePoints[letter] += pt;
+                }
+            }
+            return { points, tiePoints };
+        }
+
+        function findWinner(scores) {
+            const { points, tiePoints } = scores;
+            const maxPoints = Math.max(...Object.values(points));
+            let candidates = Object.keys(points).filter(key => points[key] === maxPoints);
+            if (candidates.length === 1) {
+                return candidates[0];
+            }
+            // Tiebreaker: max tiePoints among candidates
+            let maxTie = -1;
+            let winner = candidates[0];
+            for (let cand of candidates) {
+                if (tiePoints[cand] > maxTie) {
+                    maxTie = tiePoints[cand];
+                    winner = cand;
+                }
+            }
+            return winner;
+        }
+
+        function showResult(winner) {
+            currentProfile = profiles[winner];
+            document.getElementById('profile-name').textContent = currentProfile.name;
+            document.getElementById('product').textContent = currentProfile.product;
+            // document.getElementById('profile-img').src = profiles[winner].img || '';
+            showScreen('result');
+        }
+
+        // Event listeners
+        document.getElementById('prev-btn').addEventListener('click', () => {
+            saveCurrentAnswer();
+            if (currentQuestion > 0) {
+                showQuestion(currentQuestion - 1);
+            }
+        });
+
+        document.getElementById('next-btn').addEventListener('click', () => {
+            saveCurrentAnswer();
+            if (currentQuestion < 11) {
+                showQuestion(currentQuestion + 1);
+            } else {
+                showScreen('lead');
+            }
+        });
+
+        document.getElementById('lead-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const name = document.getElementById('name').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const whatsapp = document.getElementById('whatsapp').value.trim();
+            const city = document.getElementById('city').value.trim();
+            const age = document.getElementById('age').value;
+            const auth = document.getElementById('auth').checked;
+
+            if (!name || !email || !whatsapp || !city || !age || !auth) {
+                alert('Por favor, preencha todos os campos obrigatórios.');
+                return;
+            }
+
+            if (!/^\(\d{2}\)\s?\d{4,5}-\d{4}$/.test(whatsapp)) {
+                alert('Formato do WhatsApp inválido. Use: (11) 99999-9999');
+                return;
+            }
+
+            const leadData = { name, email, whatsapp, city, age, auth };
+            console.log('Lead capturado:', leadData);
+            // Aqui você pode enviar para um servidor: fetch('/leads', {method: 'POST', body: JSON.stringify(leadData)})
+
+            const scores = getScores();
+            if (!scores) {
+                alert('Por favor, responda todas as perguntas do quiz.');
+                showScreen('quiz');
+                return;
+            }
+
+            const winner = findWinner(scores);
+            showResult(winner);
+        });
+
+        document.getElementById('share-btn').addEventListener('click', () => {
+            if (!currentProfile) return;
+            const text = `Meu perfil Enjoyce é ${currentProfile.name}! Produto recomendado: ${currentProfile.product} ✨ Descubra o seu! #QuizEnjoyce #PerfumeIdeal`;
+            const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
+            window.open(url, '_blank');
+        });
+
+        document.getElementById('retry-btn').addEventListener('click', () => {
+            answers.fill(-1);
+            currentQuestion = 0;
+            showScreen('quiz');
+            showQuestion(0);
+        });
+
+        // Initialize
+        showQuestion(0);
+    </script>
+</body>
+</html>
