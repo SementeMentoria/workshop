@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Plano de Ação — Semente</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+  :root {
+    --creme: #F5F0E8;
+    --bark: #3D2E1E;
+    --dourado: #B8925A;
+    --rose: #C9897A;
+    --verde: #5A7A5A;
+    --verde-light: rgba(90,122,90,0.10);
+    --areia: #DDD0BC;
+    --areia-escura: #C8B89A;
+    --accent: #5A7A5A;
+    --accent-light: rgba(90,122,90,0.10);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--creme); color: var(--bark); min-height: 100vh; }
+  body::before { content: ''; position: fixed; inset: 0; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E"); pointer-events: none; z-index: 0; opacity: 0.4; }
+
+  .page { max-width: 900px; margin: 0 auto; padding: 52px 24px 100px; position: relative; z-index: 1; }
+
+  /* ── Tabs nav ── */
+  .tabs-wrap { margin-bottom: 40px; animation: fadeDown 0.6s ease both; }
+
+  .header { text-align: center; margin-bottom: 40px; animation: fadeDown 0.7s ease both; }
+  .eyebrow { font-size: 10px; font-weight: 500; letter-spacing: 0.22em; text-transform: uppercase; color: var(--accent); display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 18px; }
+  .eyebrow::before, .eyebrow::after { content: ''; width: 28px; height: 1px; background: var(--accent); opacity: 0.5; }
+  .header h1 { font-family: 'Cormorant Garamond', serif; font-size: clamp(32px, 6vw, 48px); font-weight: 300; line-height: 1.1; letter-spacing: -0.01em; }
+  .header h1 em { font-style: italic; color: var(--accent); }
+  .header-sub { margin-top: 14px; font-size: 13.5px; font-weight: 300; opacity: 0.6; line-height: 1.65; max-width: 440px; margin-inline: auto; }
+
+  .tabs { display: flex; gap: 0; border: 1px solid var(--areia); border-radius: 2px; overflow: hidden; background: white; }
+  .tab {
+    flex: 1; padding: 14px 10px; text-align: center; cursor: pointer;
+    font-size: 12px; font-weight: 500; letter-spacing: 0.07em; text-transform: uppercase;
+    color: var(--bark); opacity: 0.45; background: white; border: none;
+    border-right: 1px solid var(--areia); transition: all 0.2s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .tab:last-child { border-right: none; }
+  .tab:hover { opacity: 0.8; background: var(--creme); }
+  .tab.active { opacity: 1; background: var(--accent); color: white; }
+  .tab .tab-icon { display: block; font-size: 16px; margin-bottom: 4px; }
+
+  /* ── Sections ── */
+  .section { display: none; animation: fadeUp 0.4s ease both; }
+  .section.active { display: block; }
+
+  /* ── Shared card ── */
+  .card { background: white; border: 1px solid var(--areia); border-radius: 2px; padding: 36px 40px 32px; position: relative; box-shadow: 0 2px 20px rgba(61,46,30,0.06); margin-bottom: 16px; }
+  .card::before { content: ''; position: absolute; top: 0; left: 32px; right: 32px; height: 2px; background: linear-gradient(90deg, var(--accent), transparent); }
+  .card-tag { font-size: 10px; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent); margin-bottom: 8px; }
+  .card-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(20px, 3vw, 27px); font-weight: 400; line-height: 1.25; margin-bottom: 6px; }
+  .card-hint { font-size: 12.5px; font-weight: 300; opacity: 0.5; line-height: 1.65; margin-bottom: 20px; font-style: italic; }
+
+  .field-label { font-size: 10px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; opacity: 0.4; margin-bottom: 7px; }
+
+  input[type="text"], input[type="date"], textarea, select {
+    width: 100%; background: var(--creme); border: 1px solid var(--areia); border-radius: 2px;
+    padding: 11px 14px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 300;
+    line-height: 1.7; color: var(--bark); outline: none; transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  textarea { resize: vertical; min-height: 80px; }
+  input::placeholder, textarea::placeholder { color: var(--bark); opacity: 0.28; font-style: italic; }
+  input:focus, textarea:focus, select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(90,122,90,0.12); }
+  select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%233D2E1E' opacity='.3'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px; }
+
+  .autosave { font-size: 10px; color: var(--verde); opacity: 0; text-align: right; margin-top: 5px; transition: opacity 0.3s; height: 14px; }
+  .autosave.show { opacity: 1; }
+
+  /* ── SMART ── */
+  .smart-objetivo { margin-bottom: 28px; }
+  .smart-objetivo-field { font-family: 'Cormorant Garamond', serif; font-size: 22px; padding: 14px 18px; }
+
+  .smart-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+  .smart-item {
+    border: 1px solid var(--areia); border-radius: 2px; padding: 20px 22px;
+    position: relative; background: var(--creme);
+  }
+  .smart-item::before { content: ''; position: absolute; top: 0; left: 0; bottom: 0; width: 3px; border-radius: 2px 0 0 2px; background: var(--accent); opacity: 0.4; }
+
+  .smart-letter {
+    font-family: 'Cormorant Garamond', serif; font-size: 36px; font-weight: 300;
+    color: var(--accent); line-height: 1; margin-bottom: 2px; opacity: 0.7;
+  }
+  .smart-word { font-size: 10px; font-weight: 500; letter-spacing: 0.15em; text-transform: uppercase; opacity: 0.45; margin-bottom: 6px; }
+  .smart-question { font-size: 13px; font-weight: 300; opacity: 0.65; line-height: 1.5; margin-bottom: 12px; font-style: italic; }
+
+  .smart-check-row { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
+  .smart-check { width: 16px; height: 16px; border: 1.5px solid var(--areia-escura); border-radius: 2px; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+  .smart-check.on { background: var(--accent); border-color: var(--accent); }
+  .smart-check.on::after { content: '✓'; font-size: 10px; color: white; font-weight: 600; }
+  .smart-check-label { font-size: 11.5px; opacity: 0.6; cursor: pointer; }
+
+  .smart-score {
+    display: flex; align-items: center; gap: 12px; padding: 14px 18px;
+    background: var(--accent-light); border: 1px solid rgba(90,122,90,0.2); border-radius: 2px;
+    margin-top: 16px;
+  }
+  .smart-score-num { font-family: 'Cormorant Garamond', serif; font-size: 36px; color: var(--accent); line-height: 1; }
+  .smart-score-label { font-size: 12px; font-weight: 300; opacity: 0.65; line-height: 1.5; }
+  .smart-score-bar { flex: 1; height: 4px; background: var(--areia); border-radius: 2px; overflow: hidden; }
+  .smart-score-fill { height: 100%; background: var(--accent); border-radius: 2px; transition: width 0.4s ease; }
+
+  .btn-smart-kanban {
+    width: 100%; padding: 14px; background: var(--accent); color: white; border: none;
+    border-radius: 2px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500;
+    letter-spacing: 0.07em; cursor: pointer; transition: all 0.2s; margin-top: 8px;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .btn-smart-kanban:hover { background: #486448; transform: translateY(-1px); box-shadow: 0 4px 16px rgba(90,122,90,0.3); }
+
+  /* ── Kanban ── */
+  .kanban-ref {
+    background: var(--accent-light); border: 1px solid rgba(90,122,90,0.2);
+    border-radius: 2px; padding: 14px 18px; margin-bottom: 20px;
+    font-size: 13px; font-weight: 300; line-height: 1.5;
+  }
+  .kanban-ref strong { font-weight: 500; color: var(--accent); }
+
+  .kanban-board { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 16px; }
+
+  .kanban-col { min-height: 400px; }
+
+  .col-header {
+    padding: 10px 14px; border-radius: 2px 2px 0 0; margin-bottom: 8px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .col-header-label { font-size: 10px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: white; }
+  .col-count { font-size: 11px; font-weight: 500; background: rgba(255,255,255,0.25); border-radius: 10px; padding: 1px 7px; color: white; }
+
+  .col-backlog   .col-header { background: var(--areia-escura); }
+  .col-afazer    .col-header { background: var(--dourado); }
+  .col-andamento .col-header { background: var(--accent); }
+  .col-concluido .col-header { background: var(--bark); }
+
+  .col-cards { min-height: 300px; padding: 4px 2px; display: flex; flex-direction: column; gap: 8px; }
+
+  .k-card {
+    background: white; border: 1px solid var(--areia); border-radius: 2px;
+    padding: 12px 14px; cursor: grab; position: relative;
+    box-shadow: 0 1px 6px rgba(61,46,30,0.06); transition: box-shadow 0.2s, transform 0.15s;
+    user-select: none;
+  }
+  .k-card:active { cursor: grabbing; transform: rotate(1deg); box-shadow: 0 4px 16px rgba(61,46,30,0.15); }
+  .k-card.dragging { opacity: 0.5; }
+  .k-card.drag-over { border-color: var(--accent); }
+
+  .k-card-title { font-size: 13px; font-weight: 400; line-height: 1.4; margin-bottom: 6px; }
+  .k-card-meta { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+
+  .k-priority {
+    font-size: 9px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 2px 7px; border-radius: 10px;
+  }
+  .k-priority.alta   { background: rgba(201,137,122,0.15); color: var(--rose); }
+  .k-priority.media  { background: rgba(184,146,90,0.15);  color: var(--dourado); }
+  .k-priority.baixa  { background: rgba(90,122,90,0.12);   color: var(--verde); }
+
+  .k-date { font-size: 10px; opacity: 0.4; font-weight: 300; }
+  .k-from-smart { font-size: 9px; font-weight: 500; color: var(--accent); opacity: 0.7; letter-spacing: 0.05em; }
+
+  .k-del { position: absolute; top: 8px; right: 8px; background: none; border: none; cursor: pointer; color: var(--bark); opacity: 0.2; font-size: 14px; transition: opacity 0.2s; padding: 2px; }
+  .k-del:hover { opacity: 0.6; }
+
+  .col-drop-zone {
+    min-height: 60px; border: 1.5px dashed var(--areia); border-radius: 2px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; opacity: 0.4; transition: all 0.2s; flex: 1;
+  }
+  .col-drop-zone.drag-active { border-color: var(--accent); background: var(--accent-light); opacity: 1; }
+
+  /* Add card */
+  .add-card-form { margin-top: 8px; }
+  .btn-add-card {
+    width: 100%; padding: 8px; background: transparent; border: 1px dashed var(--areia-escura);
+    border-radius: 2px; font-family: 'DM Sans', sans-serif; font-size: 11px; color: var(--bark);
+    opacity: 0.4; cursor: pointer; transition: all 0.2s; text-align: center;
+  }
+  .btn-add-card:hover { opacity: 0.8; border-color: var(--accent); color: var(--accent); }
+
+  .new-card-input { padding: 8px 10px; font-size: 13px; min-height: auto; margin-bottom: 6px; }
+  .new-card-row { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 6px; }
+  .new-card-actions { display: flex; gap: 6px; }
+  .btn-confirm { flex: 1; padding: 8px; background: var(--accent); color: white; border: none; border-radius: 2px; font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.2s; font-family: 'DM Sans', sans-serif; }
+  .btn-confirm:hover { background: #486448; }
+  .btn-cancel { padding: 8px 12px; background: transparent; border: 1px solid var(--areia); border-radius: 2px; font-size: 12px; cursor: pointer; color: var(--bark); opacity: 0.5; font-family: 'DM Sans', sans-serif; }
+  .btn-cancel:hover { opacity: 1; }
+
+  /* ── Tarefas ── */
+  .tarefa-add { display: grid; grid-template-columns: 1fr auto auto auto; gap: 10px; align-items: start; margin-bottom: 20px; }
+  .tarefa-input-wrap { display: flex; flex-direction: column; gap: 6px; }
+  .tarefa-add-btn { padding: 11px 20px; background: var(--accent); color: white; border: none; border-radius: 2px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; white-space: nowrap; transition: all 0.2s; height: 44px; }
+  .tarefa-add-btn:hover { background: #486448; }
+
+  .tarefa-filters { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+  .filter-btn { padding: 5px 14px; border-radius: 20px; border: 1px solid var(--areia); background: white; font-size: 11px; font-weight: 500; color: var(--bark); opacity: 0.55; cursor: pointer; transition: all 0.2s; font-family: 'DM Sans', sans-serif; }
+  .filter-btn:hover { opacity: 0.9; }
+  .filter-btn.active { background: var(--accent); border-color: var(--accent); color: white; opacity: 1; }
+
+  .tarefa-list { display: flex; flex-direction: column; gap: 8px; }
+
+  .tarefa-item {
+    background: white; border: 1px solid var(--areia); border-radius: 2px;
+    padding: 14px 16px; display: flex; align-items: flex-start; gap: 12px;
+    transition: all 0.2s; position: relative;
+  }
+  .tarefa-item.done { opacity: 0.55; }
+  .tarefa-item.done .tarefa-title { text-decoration: line-through; text-decoration-color: var(--areia-escura); }
+
+  .tarefa-check {
+    width: 20px; height: 20px; border: 1.5px solid var(--areia-escura); border-radius: 2px;
+    cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s; margin-top: 1px;
+  }
+  .tarefa-check.on { background: var(--accent); border-color: var(--accent); }
+  .tarefa-check.on::after { content: '✓'; font-size: 11px; color: white; font-weight: 600; }
+
+  .tarefa-body { flex: 1; }
+  .tarefa-title { font-size: 14px; font-weight: 400; line-height: 1.4; margin-bottom: 4px; }
+  .tarefa-meta { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+
+  .t-priority { font-size: 10px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; padding: 2px 8px; border-radius: 10px; }
+  .t-priority.alta  { background: rgba(201,137,122,0.15); color: var(--rose); }
+  .t-priority.media { background: rgba(184,146,90,0.15);  color: var(--dourado); }
+  .t-priority.baixa { background: rgba(90,122,90,0.12);   color: var(--verde); }
+
+  .t-date { font-size: 11px; opacity: 0.45; }
+  .t-del { background: none; border: none; cursor: pointer; color: var(--bark); opacity: 0.2; font-size: 14px; transition: opacity 0.2s; flex-shrink: 0; margin-top: 1px; }
+  .t-del:hover { opacity: 0.6; }
+
+  .tarefa-empty { text-align: center; padding: 40px 20px; font-size: 13px; opacity: 0.35; font-style: italic; }
+
+  /* Stats row */
+  .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
+  .stat-box { background: white; border: 1px solid var(--areia); border-radius: 2px; padding: 14px 18px; text-align: center; }
+  .stat-num { font-family: 'Cormorant Garamond', serif; font-size: 32px; font-weight: 300; color: var(--accent); line-height: 1; }
+  .stat-label { font-size: 10px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.4; margin-top: 4px; }
+
+  /* ── Buttons ── */
+  .btn { display: inline-flex; align-items: center; gap: 8px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; letter-spacing: 0.06em; padding: 12px 24px; border-radius: 2px; border: none; cursor: pointer; transition: all 0.2s; }
+  .btn-ghost { background: transparent; color: var(--bark); opacity: 0.45; padding-left: 0; }
+  .btn-ghost:hover { opacity: 1; }
+  .btn-verde { background: var(--accent); color: white; }
+  .btn-verde:hover { background: #486448; transform: translateY(-1px); box-shadow: 0 4px 16px rgba(90,122,90,0.3); }
+  .btn-outline { background: transparent; border: 1px solid var(--areia-escura); color: var(--bark); opacity: 0.7; }
+  .btn-outline:hover { opacity: 1; border-color: var(--bark); }
+
+  .export-row { display: flex; justify-content: center; gap: 12px; margin-top: 28px; flex-wrap: wrap; }
+  .pdf-loading { display: none; align-items: center; gap: 8px; font-size: 12px; color: var(--accent); }
+  .pdf-loading.show { display: flex; }
+  .spinner { width: 14px; height: 14px; border: 2px solid var(--areia); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; }
+
+  @keyframes fadeDown { from { opacity: 0; transform: translateY(-14px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes fadeUp   { from { opacity: 0; transform: translateY(14px);  } to { opacity: 1; transform: translateY(0); } }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  @media (max-width: 700px) {
+    .kanban-board { grid-template-columns: 1fr 1fr; }
+    .smart-grid { grid-template-columns: 1fr; }
+    .tarefa-add { grid-template-columns: 1fr 1fr; grid-template-rows: auto auto; }
+    .tarefa-add .tarefa-add-btn { grid-column: 1/-1; height: auto; }
+    .stats-row { grid-template-columns: repeat(3,1fr); }
+  }
+  @media (max-width: 480px) {
+    .kanban-board { grid-template-columns: 1fr; }
+    .tabs .tab .tab-icon { display: none; }
+    .new-card-row { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="header">
+    <div class="eyebrow">7º Encontro · Semente</div>
+    <h1>Plano Real<br><em>de Ação</em></h1>
+    <p class="header-sub">Clareza sem execução não muda nada. Aqui você transforma intenção em movimento — objetivo, tarefas e fluxo de trabalho.</p>
+  </div>
+
+  <div class="tabs-wrap">
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab(0)">
+        <span class="tab-icon">🎯</span>Objetivo SMART
+      </button>
+      <button class="tab" onclick="switchTab(1)">
+        <span class="tab-icon">📋</span>Kanban
+      </button>
+      <button class="tab" onclick="switchTab(2)">
+        <span class="tab-icon">✅</span>Tarefas
+      </button>
+    </div>
+  </div>
+
+  <!-- ══════════ TAB 0: SMART ══════════ -->
+  <div class="section active" id="tab0">
+    <div class="card">
+      <div class="card-tag">Objetivo SMART</div>
+      <div class="card-title">Defina o objetivo que vai guiar sua execução</div>
+      <div class="card-hint">Um bom objetivo tem endereço certo. Antes de criar tarefas, precisamos garantir que o que você quer alcançar é claro, mensurável e real.</div>
+
+      <div class="smart-objetivo">
+        <div class="field-label">Qual é o seu objetivo?</div>
+        <input type="text" class="smart-objetivo-field" id="smart_objetivo" placeholder="Escreva seu objetivo em uma frase..." oninput="saveSmart()">
+      </div>
+
+      <div class="smart-grid" id="smartGrid">
+        <!-- renderizado via JS -->
+      </div>
+
+      <div class="smart-score" id="smartScore">
+        <div class="smart-score-num" id="scoreNum">0/5</div>
+        <div style="flex:1">
+          <div class="smart-score-bar"><div class="smart-score-fill" id="scoreFill" style="width:0%"></div></div>
+          <div class="smart-score-label" id="scoreLabel" style="margin-top:6px;">Preencha os critérios para validar seu objetivo</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="padding:24px 32px;">
+      <div class="card-tag">Enviar para o Kanban</div>
+      <div class="card-title" style="font-size:18px;margin-bottom:6px;">Adicione as tarefas deste objetivo ao Kanban</div>
+      <div class="card-hint" style="margin-bottom:16px;">Cada ação que você precisa tomar para alcançar o objetivo vira um card no Backlog.</div>
+      <div id="smartTarefasWrap">
+        <div id="smartTarefasList" style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px;"></div>
+        <button class="btn-add-card" style="margin-bottom:8px;" onclick="addSmartTarefa()">+ Adicionar ação ao objetivo</button>
+      </div>
+      <button class="btn-smart-kanban" onclick="sendSmartToKanban()">
+        Enviar tudo para o Kanban →
+      </button>
+    </div>
+  </div>
+
+  <!-- ══════════ TAB 1: KANBAN ══════════ -->
+  <div class="section" id="tab1">
+
+    <div class="kanban-ref" id="kanbanRef" style="display:none">
+      <strong>Objetivo ativo:</strong> <span id="kanbanObjetivo"></span>
+    </div>
+
+    <div class="kanban-board">
+      <div class="kanban-col col-backlog">
+        <div class="col-header"><span class="col-header-label">Backlog</span><span class="col-count" id="cnt-backlog">0</span></div>
+        <div class="col-cards" id="col-backlog" ondragover="onDragOver(event)" ondrop="onDrop(event,'backlog')"></div>
+        <div class="add-card-form"><button class="btn-add-card" onclick="showAddForm('backlog')">+ Adicionar card</button><div class="new-card-inline" id="form-backlog" style="display:none"></div></div>
+      </div>
+      <div class="kanban-col col-afazer">
+        <div class="col-header"><span class="col-header-label">A fazer</span><span class="col-count" id="cnt-afazer">0</span></div>
+        <div class="col-cards" id="col-afazer" ondragover="onDragOver(event)" ondrop="onDrop(event,'afazer')"></div>
+        <div class="add-card-form"><button class="btn-add-card" onclick="showAddForm('afazer')">+ Adicionar card</button><div class="new-card-inline" id="form-afazer" style="display:none"></div></div>
+      </div>
+      <div class="kanban-col col-andamento">
+        <div class="col-header"><span class="col-header-label">Em andamento</span><span class="col-count" id="cnt-andamento">0</span></div>
+        <div class="col-cards" id="col-andamento" ondragover="onDragOver(event)" ondrop="onDrop(event,'andamento')"></div>
+        <div class="add-card-form"><button class="btn-add-card" onclick="showAddForm('andamento')">+ Adicionar card</button><div class="new-card-inline" id="form-andamento" style="display:none"></div></div>
+      </div>
+      <div class="kanban-col col-concluido">
+        <div class="col-header"><span class="col-header-label">Concluído</span><span class="col-count" id="cnt-concluido">0</span></div>
+        <div class="col-cards" id="col-concluido" ondragover="onDragOver(event)" ondrop="onDrop(event,'concluido')"></div>
+        <div class="add-card-form"><button class="btn-add-card" onclick="showAddForm('concluido')">+ Adicionar card</button><div class="new-card-inline" id="form-concluido" style="display:none"></div></div>
+      </div>
+    </div>
+
+    <div class="export-row">
+      <button class="btn btn-verde" onclick="exportPDF()">↓ Exportar PDF</button>
+      <div class="pdf-loading" id="pdfLoading"><div class="spinner"></div> Gerando...</div>
+    </div>
+  </div>
+
+  <!-- ══════════ TAB 2: TAREFAS ══════════ -->
+  <div class="section" id="tab2">
+
+    <div class="stats-row">
+      <div class="stat-box"><div class="stat-num" id="st-total">0</div><div class="stat-label">Total</div></div>
+      <div class="stat-box"><div class="stat-num" id="st-done">0</div><div class="stat-label">Concluídas</div></div>
+      <div class="stat-box"><div class="stat-num" id="st-alta">0</div><div class="stat-label">Alta prioridade</div></div>
+    </div>
+
+    <div class="card">
+      <div class="card-tag">Nova tarefa</div>
+      <div class="tarefa-add">
+        <div class="tarefa-input-wrap" style="grid-column:1/-1">
+          <input type="text" id="t-nome" placeholder="Nome da tarefa..." style="font-size:15px;">
+        </div>
+        <select id="t-prior">
+          <option value="alta">🔴 Alta</option>
+          <option value="media" selected>🟡 Média</option>
+          <option value="baixa">🟢 Baixa</option>
+        </select>
+        <input type="date" id="t-date" style="min-width:130px;">
+        <button class="tarefa-add-btn" onclick="addTarefa()">+ Adicionar</button>
+      </div>
+    </div>
+
+    <div class="tarefa-filters">
+      <button class="filter-btn active" onclick="setFilter('todas',this)">Todas</button>
+      <button class="filter-btn" onclick="setFilter('alta',this)">🔴 Alta</button>
+      <button class="filter-btn" onclick="setFilter('media',this)">🟡 Média</button>
+      <button class="filter-btn" onclick="setFilter('baixa',this)">🟢 Baixa</button>
+      <button class="filter-btn" onclick="setFilter('pendentes',this)">Pendentes</button>
+      <button class="filter-btn" onclick="setFilter('concluidas',this)">Concluídas</button>
+    </div>
+
+    <div class="tarefa-list" id="tarefaList"></div>
+  </div>
+
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════════════════════════════════
+const KEY = 'semente-acao';
+let state = {
+  smart: {
+    objetivo: '',
+    checks: [false,false,false,false,false],
+    tarefas: [] // [{titulo, prioridade, prazo}]
+  },
+  kanban: {
+    cards: [] // [{id, titulo, prioridade, prazo, coluna, fromSmart}]
+  },
+  tarefas: [] // [{id, titulo, prioridade, prazo, done}]
+};
+
+let dragId = null;
+let tarefaFilter = 'todas';
+let saveTimer = null;
+
+const SMART_ITEMS = [
+  { letter:'S', word:'Específico', question:'O objetivo é claro e concreto, sem margem para interpretação?' },
+  { letter:'M', word:'Mensurável', question:'Como você vai saber que alcançou? Existe um número, data ou resultado verificável?' },
+  { letter:'A', word:'Alcançável', question:'Este objetivo é realista considerando seus recursos e tempo disponíveis?' },
+  { letter:'R', word:'Relevante', question:'Esse objetivo realmente move o que importa para o seu projeto agora?' },
+  { letter:'T', word:'Temporal', question:'Há uma data ou prazo definido para alcançar esse objetivo?' },
+];
+
+const SCORE_LABELS = ['Ainda precisa ser refinado','Quase lá — falta algum critério','Objetivo bem estruturado','Objetivo sólido e acionável','Objetivo SMART completo! ✦'];
+
+// ══════════════════════════════════════════════════════════════════
+//  STORAGE
+// ══════════════════════════════════════════════════════════════════
+function load() {
+  try { const d = JSON.parse(localStorage.getItem(KEY)||'{}'); if (d.smart) state = d; } catch(e) {}
+}
+function save() {
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => localStorage.setItem(KEY, JSON.stringify(state)), 500);
+}
+function saveNow() {
+  clearTimeout(saveTimer);
+  localStorage.setItem(KEY, JSON.stringify(state));
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  TABS
+// ══════════════════════════════════════════════════════════════════
+let activeTab = 0;
+function switchTab(n) {
+  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', i===n));
+  document.querySelectorAll('.section').forEach((s,i) => s.classList.toggle('active', i===n));
+  activeTab = n;
+  if (n===1) renderKanban();
+  if (n===2) renderTarefas();
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  SMART
+// ══════════════════════════════════════════════════════════════════
+function renderSmart() {
+  document.getElementById('smart_objetivo').value = state.smart.objetivo;
+  const grid = document.getElementById('smartGrid');
+  grid.innerHTML = '';
+  SMART_ITEMS.forEach((item,i) => {
+    const div = document.createElement('div');
+    div.className = 'smart-item';
+    div.innerHTML = `
+      <div class="smart-letter">${item.letter}</div>
+      <div class="smart-word">${item.word}</div>
+      <div class="smart-question">${item.question}</div>
+      <textarea rows="2" placeholder="Sua resposta para este critério..." oninput="saveSmart()"
+        id="smart_r${i}">${escHtml(state.smart.checks_text?.[i]||'')}</textarea>
+      <div class="smart-check-row">
+        <div class="smart-check ${state.smart.checks[i]?'on':''}" id="sc${i}" onclick="toggleSmartCheck(${i})"></div>
+        <label class="smart-check-label" onclick="toggleSmartCheck(${i})">Este critério está atendido</label>
+      </div>
+    `;
+    grid.appendChild(div);
+  });
+  updateScore();
+  renderSmartTarefas();
+}
+
+function saveSmart() {
+  state.smart.objetivo = document.getElementById('smart_objetivo').value;
+  if (!state.smart.checks_text) state.smart.checks_text = ['','','','',''];
+  SMART_ITEMS.forEach((_,i) => {
+    const el = document.getElementById('smart_r'+i);
+    if (el) state.smart.checks_text[i] = el.value;
+  });
+  updateScore();
+  save();
+}
+
+function toggleSmartCheck(i) {
+  state.smart.checks[i] = !state.smart.checks[i];
+  document.getElementById('sc'+i).classList.toggle('on', state.smart.checks[i]);
+  updateScore();
+  save();
+}
+
+function updateScore() {
+  const n = state.smart.checks.filter(Boolean).length;
+  document.getElementById('scoreNum').textContent = n+'/5';
+  document.getElementById('scoreFill').style.width = (n/5*100)+'%';
+  document.getElementById('scoreLabel').textContent = SCORE_LABELS[Math.max(0,n-1)] || SCORE_LABELS[0];
+}
+
+// Smart tarefas
+function renderSmartTarefas() {
+  const list = document.getElementById('smartTarefasList');
+  list.innerHTML = '';
+  (state.smart.tarefas||[]).forEach((t,i) => {
+    const div = document.createElement('div');
+    div.style.cssText = 'display:grid;grid-template-columns:1fr auto auto auto;gap:8px;align-items:center;';
+    div.innerHTML = `
+      <input type="text" value="${escHtml(t.titulo)}" placeholder="Ação..." style="font-size:13px;"
+        oninput="state.smart.tarefas[${i}].titulo=this.value;save()">
+      <select style="font-size:12px;padding:8px 28px 8px 10px;" onchange="state.smart.tarefas[${i}].prioridade=this.value;save()">
+        <option value="alta" ${t.prioridade==='alta'?'selected':''}>🔴 Alta</option>
+        <option value="media" ${t.prioridade==='media'?'selected':''}>🟡 Média</option>
+        <option value="baixa" ${t.prioridade==='baixa'?'selected':''}>🟢 Baixa</option>
+      </select>
+      <input type="date" value="${t.prazo||''}" style="font-size:12px;" onchange="state.smart.tarefas[${i}].prazo=this.value;save()">
+      <button onclick="removeSmartTarefa(${i})" style="background:none;border:none;cursor:pointer;color:var(--bark);opacity:0.25;font-size:16px;" title="Remover">×</button>
+    `;
+    list.appendChild(div);
+  });
+}
+
+function addSmartTarefa() {
+  if (!state.smart.tarefas) state.smart.tarefas = [];
+  state.smart.tarefas.push({ titulo:'', prioridade:'media', prazo:'' });
+  renderSmartTarefas(); save();
+}
+
+function removeSmartTarefa(i) {
+  state.smart.tarefas.splice(i,1);
+  renderSmartTarefas(); save();
+}
+
+function sendSmartToKanban() {
+  // 1. Lê todos os valores diretamente do DOM
+  const rows = document.querySelectorAll('#smartTarefasList > div');
+  const acoes = [];
+  rows.forEach((row) => {
+    const inp  = row.querySelector('input[type="text"]');
+    const sel  = row.querySelector('select');
+    const dat  = row.querySelector('input[type="date"]');
+    const titulo = inp ? inp.value.trim() : '';
+    if (!titulo) return;
+    acoes.push({
+      titulo,
+      prioridade: sel ? sel.value : 'media',
+      prazo:      dat ? dat.value : ''
+    });
+  });
+
+  if (!acoes.length) {
+    alert('Adicione pelo menos uma ação com título antes de enviar para o Kanban.');
+    return;
+  }
+
+  // 2. Garante que state.kanban.cards existe
+  if (!state.kanban) state.kanban = { cards: [] };
+  if (!state.kanban.cards) state.kanban.cards = [];
+
+  // 3. Adiciona os cards
+  acoes.forEach(t => {
+    state.kanban.cards.push({
+      id: uid(),
+      titulo: t.titulo,
+      prioridade: t.prioridade,
+      prazo: t.prazo,
+      coluna: 'backlog',
+      fromSmart: true
+    });
+  });
+
+  // 4. Salva sincronamente e navega
+  saveNow();
+  switchTab(1);
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  KANBAN
+// ══════════════════════════════════════════════════════════════════
+const COLS = ['backlog','afazer','andamento','concluido'];
+
+function renderKanban() {
+  const obj = state.smart.objetivo;
+  const ref = document.getElementById('kanbanRef');
+  if (obj) { ref.style.display='block'; document.getElementById('kanbanObjetivo').textContent = obj; }
+  else ref.style.display='none';
+
+  COLS.forEach(col => {
+    const el = document.getElementById('col-'+col);
+    el.innerHTML = '';
+    const cards = state.kanban.cards.filter(c => c.coluna===col);
+    document.getElementById('cnt-'+col).textContent = cards.length;
+    if (!cards.length) {
+      const dz = document.createElement('div');
+      dz.className = 'col-drop-zone';
+      dz.id = 'dz-'+col;
+      dz.textContent = 'Solte aqui';
+      dz.ondragover = e => { e.preventDefault(); dz.classList.add('drag-active'); };
+      dz.ondragleave = () => dz.classList.remove('drag-active');
+      dz.ondrop = e => { e.preventDefault(); dz.classList.remove('drag-active'); moveCard(dragId, col); };
+      el.appendChild(dz);
+    } else {
+      cards.forEach(card => el.appendChild(makeCard(card)));
+    }
+  });
+}
+
+function makeCard(card) {
+  const div = document.createElement('div');
+  div.className = 'k-card';
+  div.draggable = true;
+  div.dataset.id = card.id;
+  div.innerHTML = `
+    <button class="k-del" onclick="deleteCard('${card.id}')">×</button>
+    <div class="k-card-title">${escHtml(card.titulo)}</div>
+    <div class="k-card-meta">
+      <span class="k-priority ${card.prioridade}">${card.prioridade}</span>
+      ${card.prazo ? `<span class="k-date">📅 ${fmtDate(card.prazo)}</span>` : ''}
+      ${card.fromSmart ? `<span class="k-from-smart">SMART</span>` : ''}
+    </div>
+    <div style="margin-top:8px;display:flex;gap:4px;flex-wrap:wrap;">
+      ${COLS.map(c => c!==card.coluna ? `<button onclick="moveCard('${card.id}','${c}')" style="font-size:9px;padding:2px 7px;border:1px solid var(--areia);border-radius:10px;background:transparent;cursor:pointer;opacity:0.5;font-family:'DM Sans',sans-serif;">${colLabel(c)}</button>` : '').join('')}
+    </div>
+  `;
+  div.addEventListener('dragstart', () => { dragId = card.id; div.classList.add('dragging'); });
+  div.addEventListener('dragend', () => div.classList.remove('dragging'));
+  return div;
+}
+
+function colLabel(c) {
+  return { backlog:'Backlog', afazer:'A fazer', andamento:'Andamento', concluido:'Concluído' }[c];
+}
+
+function moveCard(id, coluna) {
+  const card = state.kanban.cards.find(c => c.id===id);
+  if (card) { card.coluna = coluna; save(); renderKanban(); }
+}
+
+function deleteCard(id) {
+  state.kanban.cards = state.kanban.cards.filter(c => c.id!==id);
+  save(); renderKanban();
+}
+
+function onDragOver(e) { e.preventDefault(); }
+function onDrop(e, col) { e.preventDefault(); if (dragId) { moveCard(dragId, col); dragId = null; } }
+
+function showAddForm(col) {
+  COLS.forEach(c => { document.getElementById('form-'+c).style.display='none'; document.getElementById('form-'+c).innerHTML=''; });
+  const form = document.getElementById('form-'+col);
+  form.style.display = 'block';
+  form.innerHTML = `
+    <input type="text" class="new-card-input" id="nc-titulo-${col}" placeholder="Título do card...">
+    <div class="new-card-row">
+      <select id="nc-prior-${col}">
+        <option value="alta">🔴 Alta</option>
+        <option value="media" selected>🟡 Média</option>
+        <option value="baixa">🟢 Baixa</option>
+      </select>
+      <input type="date" id="nc-date-${col}">
+    </div>
+    <div class="new-card-actions">
+      <button class="btn-confirm" onclick="confirmCard('${col}')">Adicionar</button>
+      <button class="btn-cancel" onclick="document.getElementById('form-${col}').style.display='none'">Cancelar</button>
+    </div>
+  `;
+  setTimeout(() => document.getElementById('nc-titulo-'+col)?.focus(), 50);
+}
+
+function confirmCard(col) {
+  const titulo = document.getElementById('nc-titulo-'+col)?.value?.trim();
+  if (!titulo) return;
+  state.kanban.cards.push({
+    id: uid(), titulo,
+    prioridade: document.getElementById('nc-prior-'+col)?.value || 'media',
+    prazo: document.getElementById('nc-date-'+col)?.value || '',
+    coluna: col, fromSmart: false
+  });
+  save(); renderKanban();
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  TAREFAS
+// ══════════════════════════════════════════════════════════════════
+function addTarefa() {
+  const nome = document.getElementById('t-nome').value.trim();
+  if (!nome) return;
+  state.tarefas.push({
+    id: uid(), titulo: nome,
+    prioridade: document.getElementById('t-prior').value,
+    prazo: document.getElementById('t-date').value,
+    done: false
+  });
+  document.getElementById('t-nome').value = '';
+  document.getElementById('t-date').value = '';
+  save(); renderTarefas();
+}
+document.getElementById('t-nome').addEventListener('keydown', e => { if (e.key==='Enter') addTarefa(); });
+
+function toggleTarefa(id) {
+  const t = state.tarefas.find(t=>t.id===id);
+  if (t) { t.done=!t.done; save(); renderTarefas(); }
+}
+
+function deleteTarefa(id) {
+  state.tarefas = state.tarefas.filter(t=>t.id!==id);
+  save(); renderTarefas();
+}
+
+function setFilter(f, btn) {
+  tarefaFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderTarefas();
+}
+
+function renderTarefas() {
+  const list = document.getElementById('tarefaList');
+  list.innerHTML = '';
+
+  let filtered = [...state.tarefas];
+  if (tarefaFilter==='alta')      filtered = filtered.filter(t=>t.prioridade==='alta');
+  if (tarefaFilter==='media')     filtered = filtered.filter(t=>t.prioridade==='media');
+  if (tarefaFilter==='baixa')     filtered = filtered.filter(t=>t.prioridade==='baixa');
+  if (tarefaFilter==='pendentes') filtered = filtered.filter(t=>!t.done);
+  if (tarefaFilter==='concluidas')filtered = filtered.filter(t=>t.done);
+
+  // Sort: pendentes primeiro, alta prioridade primeiro
+  filtered.sort((a,b) => {
+    if (a.done !== b.done) return a.done ? 1 : -1;
+    const p = {alta:0,media:1,baixa:2};
+    return p[a.prioridade]-p[b.prioridade];
+  });
+
+  if (!filtered.length) {
+    list.innerHTML = '<div class="tarefa-empty">Nenhuma tarefa encontrada.</div>';
+  } else {
+    filtered.forEach(t => {
+      const div = document.createElement('div');
+      div.className = 'tarefa-item' + (t.done?' done':'');
+      div.innerHTML = `
+        <div class="tarefa-check ${t.done?'on':''}" onclick="toggleTarefa('${t.id}')"></div>
+        <div class="tarefa-body">
+          <div class="tarefa-title">${escHtml(t.titulo)}</div>
+          <div class="tarefa-meta">
+            <span class="t-priority ${t.prioridade}">${t.prioridade}</span>
+            ${t.prazo ? `<span class="t-date">📅 ${fmtDate(t.prazo)}</span>` : ''}
+          </div>
+        </div>
+        <button class="t-del" onclick="deleteTarefa('${t.id}')">×</button>
+      `;
+      list.appendChild(div);
+    });
+  }
+
+  // Stats
+  document.getElementById('st-total').textContent = state.tarefas.length;
+  document.getElementById('st-done').textContent = state.tarefas.filter(t=>t.done).length;
+  document.getElementById('st-alta').textContent = state.tarefas.filter(t=>t.prioridade==='alta'&&!t.done).length;
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  PDF EXPORT
+// ══════════════════════════════════════════════════════════════════
+async function exportPDF() {
+  const btn = document.querySelector('#tab1 .btn-verde');
+  const loading = document.getElementById('pdfLoading');
+  btn.style.display='none'; loading.classList.add('show');
+  await new Promise(r=>setTimeout(r,80));
+
+  try {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ orientation:'p', unit:'mm', format:'a4' });
+    const W=210, mL=22, mR=22, cW=W-mL-mR;
+    let y=0;
+    const C = { creme:[245,240,232],bark:[61,46,30],verde:[90,122,90],dourado:[184,146,90],rose:[201,137,122],areia:[221,208,188],white:[255,255,255] };
+    const sf=c=>doc.setFillColor(c[0],c[1],c[2]);
+    const sd=c=>doc.setDrawColor(c[0],c[1],c[2]);
+    const st=c=>doc.setTextColor(c[0],c[1],c[2]);
+
+    function newPage() { doc.addPage(); sf(C.creme); doc.rect(0,0,W,297,'F'); y=24; }
+    function checkY(n=20) { if(y+n>272) newPage(); }
+
+    // Capa
+    sf(C.creme); doc.rect(0,0,W,297,'F');
+    sf(C.verde); doc.rect(0,0,W,3,'F');
+    st(C.areia); doc.setFontSize(120); doc.setFont('helvetica','normal');
+    doc.text('7',W-22,106,{align:'right'});
+    st(C.verde); doc.setFontSize(9); doc.setFont('helvetica','normal');
+    doc.text('7º ENCONTRO · SEMENTE', mL, 54);
+    st(C.bark); doc.setFontSize(34); doc.setFont('helvetica','bold');
+    doc.text('Plano Real de', mL, 72);
+    st(C.verde); doc.setFontSize(34); doc.text('Ação', mL, 86);
+    const dateStr = new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'});
+    sd(C.areia); doc.setLineWidth(0.4); doc.line(mL,100,W-mR,100);
+    st(C.bark); doc.setFontSize(9); doc.setGState(new doc.GState({opacity:0.4}));
+    doc.text(dateStr.toUpperCase(), mL, 110); doc.setGState(new doc.GState({opacity:1}));
+    sf(C.bark); doc.rect(0,274,W,23,'F');
+    st(C.creme); doc.setFontSize(8); doc.setGState(new doc.GState({opacity:0.55}));
+    doc.text('Semente — Transformação em Movimento', mL, 288); doc.setGState(new doc.GState({opacity:1}));
+
+    // SMART
+    newPage();
+    st(C.verde); doc.setFontSize(8); doc.text('OBJETIVO SMART', mL, y); y+=10;
+    if (state.smart.objetivo) {
+      st(C.bark); doc.setFontSize(18); doc.setFont('helvetica','bold');
+      const ol = doc.splitTextToSize(state.smart.objetivo, cW);
+      doc.text(ol, mL, y); y+=ol.length*7+10;
+    }
+    const score = state.smart.checks.filter(Boolean).length;
+    sf(C.verde); doc.setGState(new doc.GState({opacity:0.15})); doc.roundedRect(mL,y,cW,10,1,1,'F'); doc.setGState(new doc.GState({opacity:1}));
+    sf(C.verde); doc.roundedRect(mL,y,(cW*score/5),10,1,1,'F');
+    st(C.white); doc.setFontSize(8); doc.setFont('helvetica','bold');
+    doc.text(`${score}/5 critérios SMART atendidos`, mL+6, y+6.5); y+=18;
+
+    SMART_ITEMS.forEach((item,i) => {
+      const text = state.smart.checks_text?.[i]||'';
+      const lines = text ? doc.splitTextToSize(text, cW-20) : null;
+      const h = lines ? lines.length*5+18 : 18;
+      checkY(h+4);
+      sf(state.smart.checks[i] ? C.verde : C.areia);
+      doc.setGState(new doc.GState({opacity:0.2})); doc.roundedRect(mL,y,cW,h,1,1,'F'); doc.setGState(new doc.GState({opacity:1}));
+      sf(state.smart.checks[i] ? C.verde : C.areia); doc.roundedRect(mL,y,3,h,1,0,'F');
+      st(state.smart.checks[i] ? C.verde : C.areia); doc.setFontSize(14); doc.setFont('helvetica','bold');
+      doc.text(item.letter, mL+8, y+10);
+      st(C.bark); doc.setFontSize(9); doc.setFont('helvetica','bold');
+      doc.text(item.word.toUpperCase(), mL+18, y+7);
+      if (lines) {
+        doc.setFont('helvetica','normal'); doc.setFontSize(9);
+        doc.setGState(new doc.GState({opacity:0.75})); doc.text(lines, mL+18, y+13); doc.setGState(new doc.GState({opacity:1}));
+      }
+      y+=h+4;
+    });
+
+    // Kanban
+    newPage();
+    st(C.verde); doc.setFontSize(8); doc.setFont('helvetica','normal');
+    doc.text('KANBAN', mL, y); y+=12;
+
+    const colColors = { backlog:C.areia, afazer:C.dourado, andamento:C.verde, concluido:C.bark };
+    const colW = (cW-6)/4;
+
+    COLS.forEach((col,ci) => {
+      const cx = mL + ci*(colW+2);
+      const cards = state.kanban.cards.filter(c=>c.coluna===col);
+      sf(colColors[col]); doc.setGState(new doc.GState({opacity:0.9}));
+      doc.roundedRect(cx,y,colW,8,1,0,'F'); doc.setGState(new doc.GState({opacity:1}));
+      st(C.white); doc.setFontSize(7); doc.setFont('helvetica','bold');
+      doc.text(colLabel(col).toUpperCase(), cx+colW/2, y+5.5, {align:'center'});
+    });
+    y+=12;
+
+    // Cards per column — simple list
+    const maxCards = Math.max(...COLS.map(c=>state.kanban.cards.filter(k=>k.coluna===c).length),1);
+    COLS.forEach((col,ci) => {
+      const cx = mL + ci*(colW+2);
+      let cy = y;
+      const cards = state.kanban.cards.filter(c=>c.coluna===col);
+      cards.forEach(card => {
+        const tl = doc.splitTextToSize(card.titulo, colW-8);
+        const ch = tl.length*4.5+10;
+        if (cy + ch > 270) return;
+        sf(C.white); doc.roundedRect(cx, cy, colW, ch, 0.5,0.5,'F');
+        sd(C.areia); doc.setLineWidth(0.2); doc.roundedRect(cx, cy, colW, ch, 0.5,0.5,'S');
+        const pc = card.prioridade==='alta'?C.rose:card.prioridade==='media'?C.dourado:C.verde;
+        sf(pc); doc.rect(cx,cy,colW,1,'F');
+        st(C.bark); doc.setFontSize(8); doc.setFont('helvetica','normal');
+        doc.text(tl, cx+3, cy+6);
+        if (card.prazo) {
+          st(C.bark); doc.setFontSize(7); doc.setGState(new doc.GState({opacity:0.4}));
+          doc.text(fmtDate(card.prazo), cx+3, cy+ch-3); doc.setGState(new doc.GState({opacity:1}));
+        }
+        cy += ch+3;
+      });
+    });
+
+    // Tarefas
+    if (state.tarefas.length>0) {
+      newPage();
+      st(C.verde); doc.setFontSize(8); doc.setFont('helvetica','normal');
+      doc.text('ORGANIZAÇÃO DE TAREFAS', mL, y); y+=12;
+      const sorted = [...state.tarefas].sort((a,b)=>{ const p={alta:0,media:1,baixa:2}; if(a.done!==b.done)return a.done?1:-1; return p[a.prioridade]-p[b.prioridade]; });
+      sorted.forEach(t => {
+        const tl = doc.splitTextToSize(t.titulo, cW-22);
+        const h = tl.length*5+10;
+        checkY(h+4);
+        sf(t.done?[240,238,234]:C.white); doc.roundedRect(mL,y,cW,h,0.5,0.5,'F');
+        sd(C.areia); doc.setLineWidth(0.2); doc.roundedRect(mL,y,cW,h,0.5,0.5,'S');
+        const pc = t.prioridade==='alta'?C.rose:t.prioridade==='media'?C.dourado:C.verde;
+        sf(pc); doc.rect(mL,y,2,h,'F');
+        if (t.done) {
+          sf(C.verde); doc.circle(mL+8,y+h/2,3,'F');
+          st(C.white); doc.setFontSize(8); doc.text('✓',mL+8,y+h/2+1,{align:'center'});
+        } else {
+          sd(C.areia); doc.setLineWidth(0.5); doc.circle(mL+8,y+h/2,3,'S');
+        }
+        st(C.bark); doc.setFontSize(9); doc.setFont('helvetica', t.done?'normal':'normal');
+        doc.setGState(new doc.GState({opacity:t.done?0.5:1}));
+        doc.text(tl, mL+16, y+6); doc.setGState(new doc.GState({opacity:1}));
+        if (t.prazo) {
+          st(C.bark); doc.setFontSize(7); doc.setGState(new doc.GState({opacity:0.4}));
+          doc.text(fmtDate(t.prazo), W-mR-2, y+6, {align:'right'}); doc.setGState(new doc.GState({opacity:1}));
+        }
+        y+=h+4;
+      });
+    }
+
+    const total = doc.internal.getNumberOfPages();
+    for(let p=1;p<=total;p++){
+      doc.setPage(p); if(p===1) continue;
+      st(C.bark); doc.setFontSize(8); doc.setGState(new doc.GState({opacity:0.3}));
+      doc.text(`${p-1}`, W/2, 290, {align:'center'}); doc.setGState(new doc.GState({opacity:1}));
+    }
+
+    doc.save('semente-plano-acao.pdf');
+  } catch(e) { console.error(e); alert('Erro ao gerar PDF.'); }
+
+  btn.style.display='inline-flex'; loading.classList.remove('show');
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  UTILS
+// ══════════════════════════════════════════════════════════════════
+function uid() { return Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
+function escHtml(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function fmtDate(d) { if(!d) return ''; try { const [y,m,dd]=d.split('-'); return `${dd}/${m}/${y}`; } catch(e){ return d; } }
+
+// ══════════════════════════════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════════════════════════════
+load();
+renderSmart();
+renderKanban();
+renderTarefas();
+</script>
+</body>
+</html>
